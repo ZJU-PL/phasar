@@ -11,6 +11,7 @@
 
 #include "phasar/PhasarLLVM/DB/LLVMProjectIRDB.h"
 #include "phasar/PhasarLLVM/Utils/LLVMShorthands.h"
+#include "phasar/Utils/LLVMCompatibility.h"
 #include "phasar/Utils/Logger.h"
 
 #include "llvm/ADT/SmallVector.h"
@@ -167,7 +168,11 @@ const llvm::Function *getDirectFunction(const llvm::Value *V) {
 }
 
 llvm::Type *getPointerType(llvm::LLVMContext &Ctx) {
+#if LLVM_VERSION_MAJOR < 15
+  return llvm::Type::getInt8PtrTy(Ctx);
+#else
   return llvm::PointerType::get(Ctx, 0);
+#endif
 }
 
 llvm::Type *getCallbackArgType(const llvm::CallBase &BrokerCall, int ArgNo) {
@@ -559,7 +564,7 @@ size_t ExternCallbackModel::rewriteCalls(LLVMProjectIRDB &IRDB) {
 }
 
 bool ExternCallbackModel::isPhasarGenerated(const llvm::Function &F) noexcept {
-  return F.hasName() && F.getName().starts_with(ModelPrefix);
+  return F.hasName() && psr::startsWith(F.getName(), ModelPrefix);
 }
 
 } // namespace psr

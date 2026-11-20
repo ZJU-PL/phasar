@@ -9,6 +9,8 @@
 
 #include "phasar/Utils/Utilities.h"
 
+#include "phasar/Utils/LLVMCompatibility.h"
+
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Demangle/Demangle.h"
 
@@ -57,15 +59,15 @@ bool psr::isConstructor(llvm::StringRef MangledName) {
 
 bool psr::isMangled(llvm::StringRef Name) {
   // See llvm/Demangle/Demangle.cpp
-  if (Name.starts_with("_Z") || Name.starts_with("___Z")) {
+  if (psr::startsWith(Name, "_Z") || psr::startsWith(Name, "___Z")) {
     // Itanium ABI
     return true;
   }
-  if (Name.starts_with("_R")) {
+  if (psr::startsWith(Name, "_R")) {
     // Rust ABI
     return true;
   }
-  if (Name.starts_with("_D")) {
+  if (psr::startsWith(Name, "_D")) {
     // D ABI
     return true;
   }

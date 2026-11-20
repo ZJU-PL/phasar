@@ -89,7 +89,11 @@ public:
 
 private:
   static bool isContained(llvm::ArrayRef<T> Data, ByConstRef<T> Val) noexcept {
+#if defined(__cpp_lib_execution) && __cpp_lib_execution >= 201902L
     auto It = std::find(std::execution::unseq, Data.begin(), Data.end(), Val);
+#else
+    auto It = std::find(Data.begin(), Data.end(), Val);
+#endif
     return It != Data.end();
   }
 

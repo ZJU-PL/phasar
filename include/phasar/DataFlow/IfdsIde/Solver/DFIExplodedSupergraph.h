@@ -217,7 +217,7 @@ private:
   edgesOf(dfi::VertexId Vtx) const noexcept {
     auto Start = VtxEdgeBegin[Vtx];
     auto End = VtxEdgeEnd[Vtx];
-    return llvm::ArrayRef(Edges).slice(Start, End - Start);
+    return llvm::ArrayRef<dfi::VertexId>(Edges).slice(Start, End - Start);
   }
 
   SCCHolder<FunctionId> CGSCCs;

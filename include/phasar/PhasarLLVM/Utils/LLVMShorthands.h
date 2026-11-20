@@ -18,6 +18,7 @@
 #define PHASAR_PHASARLLVM_UTILS_LLVMSHORTHANDS_H
 
 #include "phasar/Utils/BitSet.h"
+#include "phasar/Utils/LLVMCompatibility.h"
 #include "phasar/Utils/Utilities.h"
 
 #include "llvm/ADT/ArrayRef.h"
@@ -91,11 +92,10 @@ isAllocaInstOrHeapAllocaFunction(const llvm::Value *V) noexcept;
 ///
 /// \note This function is less useful in practice than you may think. Consider
 /// using isConsistentCall() instead.
-LLVM_DEPRECATED("With opaque pointers, this function is not very useful. Use "
-                "isConsistentCall() instead.",
-                "psr::isConsistentCall")
-bool matchesSignature(const llvm::Function *F, const llvm::FunctionType *FType,
-                      bool ExactMatch = true);
+[[deprecated(
+    "With opaque pointers, use psr::isConsistentCall() instead.")]] bool
+matchesSignature(const llvm::Function *F, const llvm::FunctionType *FType,
+                 bool ExactMatch = true);
 
 /// Returns true iff the provided functions are both not null and have the same
 /// number of paramters, the same return type and each parameter of both
@@ -103,11 +103,10 @@ bool matchesSignature(const llvm::Function *F, const llvm::FunctionType *FType,
 ///
 /// \note This function is less useful in practice than you may think. Consider
 /// using isConsistentCall() instead.
-LLVM_DEPRECATED("With opaque pointers, this function is not very useful. Use "
-                "isConsistentCall() instead.",
-                "psr::isConsistentCall")
-bool matchesSignature(const llvm::FunctionType *FType1,
-                      const llvm::FunctionType *FType2);
+[[deprecated(
+    "With opaque pointers, use psr::isConsistentCall() instead.")]] bool
+matchesSignature(const llvm::FunctionType *FType1,
+                 const llvm::FunctionType *FType2);
 
 [[nodiscard]] llvm::ModuleSlotTracker &
 getModuleSlotTrackerFor(const llvm::Value *V);
@@ -503,7 +502,7 @@ isUnconditionalBranch(const llvm::Instruction *Inst) noexcept {
 #if LLVM_VERSION_MAJOR >= 23
   return llvm::isa_and_present<llvm::UncondBrInst>(Inst);
 #else
-  if (const auto *Br = llvm::dyn_cast_if_present<llvm::BranchInst>(Inst)) {
+  if (const auto *Br = psr::dynCastIfPresent<llvm::BranchInst>(Inst)) {
     return !Br->isConditional();
   }
   return false;
@@ -513,11 +512,11 @@ isUnconditionalBranch(const llvm::Instruction *Inst) noexcept {
 [[nodiscard]] inline const llvm::Value *
 getBranchConditionOrNull(const llvm::Instruction *Inst) noexcept {
 #if LLVM_VERSION_MAJOR >= 23
-  if (const auto *CBr = llvm::dyn_cast_if_present<llvm::CondBrInst>(Inst)) {
+  if (const auto *CBr = psr::dynCastIfPresent<llvm::CondBrInst>(Inst)) {
     return CBr->getCondition();
   }
 #else
-  if (const auto *Br = llvm::dyn_cast_if_present<llvm::BranchInst>(Inst)) {
+  if (const auto *Br = psr::dynCastIfPresent<llvm::BranchInst>(Inst)) {
     return Br->getCondition();
   }
 #endif

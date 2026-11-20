@@ -34,6 +34,30 @@ PhASAR requires the following system dependencies:
 
 If you are on a Debian-based system, you may use `./utils/InstallAptDependencies.sh` to install all required dependencies. If using the `bootstrap.sh` script, it does that for you.
 
+### LLVM 14 compatibility build
+
+To build the libraries and tools against an existing LLVM 14 build tree, use a
+C++20 compiler (Apple Clang 16 works on macOS) and select LLVM explicitly:
+
+```bash
+LLVM_ROOT="$HOME/Work/tools/llvm-project-llvmorg-14.0.0"
+cmake -S . -B build-llvm14 -G Ninja \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DLLVM_DIR="$LLVM_ROOT/build/lib/cmake/llvm" \
+  -DPHASAR_LLVM_VERSION=14 \
+  -DPHASAR_ALLOW_LTO_IN_RELEASE_BUILD=OFF \
+  -DPHASAR_BUILD_UNITTESTS=OFF \
+  -DPHASAR_BUILD_IR=OFF \
+  -DPHASAR_ENABLE_INTEGRATIONTESTS=OFF \
+  -DROARING_USE_CPM=OFF
+cmake --build build-llvm14 -j 8
+```
+
+Initialize the dependency submodules as described below before configuring.
+This configuration builds all four tools with Z3, SVF, and the optional Clang
+library disabled. LLVM 14 uses its bundled CFL alias analyses and supports typed
+pointer IR. The full integration test suite is not enabled by this command.
+
 ### Compiling PhASAR (if not already done using the bootstrap script)
 
 Set the system's variables for the C and C++ compiler to clang (gcc should also work, but we strongly recommend clang):

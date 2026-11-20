@@ -109,7 +109,7 @@ bool psr::isConsistentCall(const llvm::CallBase *CallSite,
 
       const auto *ParamSRetTy = Param.getParamStructRetType();
       const auto *ArgSRetTy =
-          CallSite->getParamStructRetType(ArgOp.getOperandNo());
+          CallSite->getAttributes().getParamStructRetType(ArgOp.getOperandNo());
       if ((ParamSRetTy != nullptr) != (ArgSRetTy != nullptr)) {
         return false;
       }

@@ -259,8 +259,8 @@ public:
   explicit EdgeFunction(
       std::in_place_type_t<ConcreteEF> /*unused*/,
       ArgTys &&...Args) noexcept(IsSOOCandidate<std::decay_t<ConcreteEF>> &&
-                                 std::is_nothrow_constructible_v<ConcreteEF,
-                                                                 ArgTys...>)
+                                     std::is_nothrow_constructible_v<ConcreteEF,
+                                                                     ArgTys...>)
       : EdgeFunction(
             [](auto &&...Args) {
               if constexpr (IsSOOCandidate<std::decay_t<ConcreteEF>>) {
@@ -823,6 +823,35 @@ template <typename L> struct DenseMapInfo<psr::EdgeFunction<L>> {
   }
 };
 
+#if LLVM_VERSION_MAJOR < 15
+// LLVM 14 uses the legacy customization points for value-like casts.
+template <typename To, typename L> struct isa_impl<To, psr::EdgeFunction<L>> {
+  static bool doit(const psr::EdgeFunction<L> &EF) {
+    return EF.template isa<To>();
+  }
+};
+template <typename To, typename L>
+struct cast_retty_impl<To, psr::EdgeFunction<L>> {
+  using ret_type = const To *;
+};
+template <typename To, typename L>
+struct cast_retty_impl<To, const psr::EdgeFunction<L>> {
+  using ret_type = const To *;
+};
+template <typename To, typename L>
+struct cast_convert_val<To, psr::EdgeFunction<L>, psr::EdgeFunction<L>> {
+  static const To *doit(const psr::EdgeFunction<L> &EF) {
+    return EF.template cast<To>();
+  }
+};
+template <typename To, typename L>
+struct cast_convert_val<To, const psr::EdgeFunction<L>,
+                        const psr::EdgeFunction<L>> {
+  static const To *doit(const psr::EdgeFunction<L> &EF) {
+    return EF.template cast<To>();
+  }
+};
+#else
 template <typename To, typename L>
 struct CastIsPossible<To, psr::EdgeFunction<L>> {
   static inline bool isPossible(const psr::EdgeFunction<L> &EF) noexcept {
@@ -846,6 +875,8 @@ struct CastInfo<To, const psr::EdgeFunction<L>>
     : public ConstStrippingForwardingCast<To, const psr::EdgeFunction<L>,
                                           CastInfo<To, psr::EdgeFunction<L>>> {
 };
+
+#endif
 
 } // namespace llvm
 

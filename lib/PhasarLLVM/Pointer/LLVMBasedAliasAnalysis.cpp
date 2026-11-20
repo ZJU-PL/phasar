@@ -34,8 +34,13 @@
 #include "llvm/Passes/PassBuilder.h"
 #include "llvm/Support/ErrorHandling.h"
 
+#if LLVM_VERSION_MAJOR < 16
+#include "llvm/Analysis/CFLAndersAliasAnalysis.h"
+#include "llvm/Analysis/CFLSteensAliasAnalysis.h"
+#else
 #include "external/llvm/CFLAndersAliasAnalysis.h"
 #include "external/llvm/CFLSteensAliasAnalysis.h"
+#endif
 
 using namespace psr;
 

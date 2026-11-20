@@ -51,7 +51,11 @@ static cl::SubCommand
 static cl::list<std::string> IRPaths(cl::Positional, cl::OneOrMore,
                                      cl::desc("ptaben-ir-directory"),
                                      cl::cat(PTABenCat),
+#if LLVM_VERSION_MAJOR < 16
+                                     cl::sub(*cl::TopLevelSubCommand));
+#else
                                      cl::sub(cl::SubCommand::getTopLevel()));
+#endif
 
 static cl::opt<std::string> IRFilePath(cl::Positional, cl::Required,
                                        cl::desc("ptaben-ir-file"),

@@ -14,6 +14,7 @@
 #include "phasar/PhasarLLVM/DB/LLVMProjectIRDB.h"
 #include "phasar/PhasarLLVM/Utils/LLVMIRToSrc.h"
 #include "phasar/PhasarLLVM/Utils/LLVMShorthands.h"
+#include "phasar/Utils/LLVMCompatibility.h"
 #include "phasar/Utils/Logger.h"
 #include "phasar/Utils/Utilities.h"
 
@@ -91,8 +92,9 @@ static void addGlobals(const LLVMProjectIRDB &IRDB, TypeAssignmentGraph &TAG) {
       continue;
     }
     auto GlobName = Glob.getName();
-    if (GlobName.starts_with("_ZTV") || GlobName.starts_with("_ZTI") ||
-        GlobName.starts_with("_ZTS")) {
+    if (psr::startsWith(GlobName, "_ZTV") ||
+        psr::startsWith(GlobName, "_ZTI") ||
+        psr::startsWith(GlobName, "_ZTS")) {
       continue;
     }
 

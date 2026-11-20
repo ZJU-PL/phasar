@@ -13,6 +13,7 @@
 #include "phasar/PhasarLLVM/ControlFlow/Resolver/Resolver.h"
 #include "phasar/PhasarLLVM/TypeHierarchy/DIBasedTypeHierarchy.h"
 #include "phasar/PhasarLLVM/Utils/LLVMShorthands.h"
+#include "phasar/Utils/LLVMCompatibility.h"
 #include "phasar/Utils/Logger.h"
 #include "phasar/Utils/Utilities.h"
 
@@ -138,7 +139,7 @@ void OTFResolver::resolveVirtualCall(FunctionSetTy &PossibleTargets,
   for (const auto *P : *PTS) {
     if (const auto *PGV = llvm::dyn_cast<llvm::GlobalVariable>(P)) {
       if (PGV->hasName() &&
-          PGV->getName().starts_with(DIBasedTypeHierarchy::VTablePrefix) &&
+          psr::startsWith(PGV->getName(), DIBasedTypeHierarchy::VTablePrefix) &&
           PGV->hasInitializer()) {
         if (const auto *PCS =
                 llvm::dyn_cast<llvm::ConstantStruct>(PGV->getInitializer())) {

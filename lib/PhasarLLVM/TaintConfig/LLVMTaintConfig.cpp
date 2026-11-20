@@ -17,6 +17,7 @@
 #include "phasar/PhasarLLVM/Utils/LLVMIRToSrc.h"
 #include "phasar/PhasarLLVM/Utils/LLVMShorthands.h"
 #include "phasar/Utils/EnumFlags.h"
+#include "phasar/Utils/LLVMCompatibility.h"
 #include "phasar/Utils/Logger.h"
 #include "phasar/Utils/MapUtils.h"
 
@@ -27,6 +28,7 @@
 #include "llvm/IR/Function.h"
 #include "llvm/IR/InstIterator.h"
 #include "llvm/IR/Instructions.h"
+#include "llvm/IR/Intrinsics.h"
 #include "llvm/IR/Metadata.h"
 
 #include <string>
@@ -204,7 +206,7 @@ void LLVMTaintConfig::addAllVariables(const LLVMProjectIRDB &IRDB,
               // name is present as a local variable and also as a struct
               // member variable. (Ex. JsonConfig/fun_member_02.cpp)
               if (const auto *Scope = getOrNull(StructConfigMap, StType);
-                  Scope && Gep->getName().starts_with(*Scope)) {
+                  Scope && psr::startsWith(Gep->getName(), *Scope)) {
                 addTaintCategory(Gep, VarDesc.Cat);
               }
             }

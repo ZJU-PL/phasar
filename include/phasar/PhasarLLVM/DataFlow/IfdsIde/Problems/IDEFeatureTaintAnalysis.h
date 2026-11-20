@@ -26,8 +26,8 @@
 
 #include "llvm/ADT/FunctionExtras.h"
 #include "llvm/ADT/SmallBitVector.h"
-#include "llvm/ADT/bit.h"
 
+#include <bit>
 #include <cstdint>
 #include <functional>
 #include <string>
@@ -50,7 +50,7 @@ struct IDEFeatureTaintEdgeFact {
     }
 #endif
 
-    llvm::SmallBitVector Ret(llvm::bit_width(Bits));
+    llvm::SmallBitVector Ret(std::bit_width(Bits));
     Ret.setBitsInMask((const uint32_t *)&Bits, sizeof(Bits));
     return Ret;
   }
@@ -66,7 +66,7 @@ struct IDEFeatureTaintEdgeFact {
   }
 
   void unionWith(uintptr_t Facts) {
-    size_t RequiredSize = llvm::bit_width(Facts);
+    size_t RequiredSize = std::bit_width(Facts);
     if (RequiredSize > Taints.size()) {
       Taints.resize(RequiredSize);
     }

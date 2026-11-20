@@ -3,6 +3,7 @@
 #include "phasar/PhasarLLVM/DB/LLVMProjectIRDB.h"
 #include "phasar/PhasarLLVM/Utils/LLVMIRToSrc.h"
 #include "phasar/PhasarLLVM/Utils/LLVMShorthands.h"
+#include "phasar/Utils/LLVMCompatibility.h"
 
 #include "llvm/ADT/DenseSet.h"
 #include "llvm/BinaryFormat/Dwarf.h"
@@ -12,7 +13,7 @@
 
 static const llvm::DICompositeType *
 isCompositeStructType(const llvm::DIType *Ty) {
-  if (const auto *CompTy = llvm::dyn_cast_if_present<llvm::DICompositeType>(Ty);
+  if (const auto *CompTy = psr::dynCastIfPresent<llvm::DICompositeType>(Ty);
       CompTy && (CompTy->getTag() == llvm::dwarf::DW_TAG_structure_type ||
                  CompTy->getTag() == llvm::dwarf::DW_TAG_class_type)) {
 

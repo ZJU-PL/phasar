@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "phasar/Pointer/AliasResult.h"
+#include "phasar/Utils/LLVMCompatibility.h"
 #include "phasar/Utils/TypeTraits.h"
 #include "phasar/Utils/Utilities.h"
 
@@ -65,7 +66,7 @@ size_t checkDir(const llvm::Twine &DirName,
   size_t NumTests = 0;
 
   static constexpr auto IsLLVMIRFile = [](llvm::StringRef Path) {
-    return Path.ends_with(".ll") || Path.ends_with(".bc");
+    return psr::endsWith(Path, ".ll") || psr::endsWith(Path, ".bc");
   };
 
   for (; It != End && !EC; It.increment(EC)) {

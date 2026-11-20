@@ -11,6 +11,7 @@
 
 #include "phasar/Config/phasar-config.h"
 #include "phasar/Utils/ChronoUtils.h"
+#include "phasar/Utils/LLVMCompatibility.h"
 #include "phasar/Utils/NonNullPtr.h"
 #include "phasar/Utils/TemplateString.h"
 #include "phasar/Utils/TypeTraits.h"

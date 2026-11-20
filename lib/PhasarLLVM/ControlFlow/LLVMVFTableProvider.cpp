@@ -5,6 +5,7 @@
 #include "phasar/PhasarLLVM/TypeHierarchy/LLVMVFTable.h"
 #include "phasar/PhasarLLVM/Utils/LLVMIRToSrc.h"
 #include "phasar/PhasarLLVM/Utils/LLVMShorthands.h"
+#include "phasar/Utils/LLVMCompatibility.h"
 #include "phasar/Utils/MapUtils.h"
 
 #include "llvm/ADT/StringRef.h"
@@ -33,7 +34,7 @@ static std::string getTypeName(const llvm::DIType *DITy) {
     return llvmTypeToString(DITy, true);
   }();
 
-  if (llvm::StringRef(TypeName).starts_with(TSPrefixDemang)) {
+  if (psr::startsWith(llvm::StringRef(TypeName), TSPrefixDemang)) {
     TypeName.erase(0, TSPrefixDemang.size());
   }
 
@@ -168,10 +169,10 @@ LLVMVFTableProvider::getVTableIndexInHierarchy(
 
 llvm::StringRef
 LLVMVFTableProvider::removeVTablePrefix(llvm::StringRef GlobName) noexcept {
-  if (GlobName.starts_with(VTablePrefixDemang)) {
+  if (psr::startsWith(GlobName, VTablePrefixDemang)) {
     return GlobName.drop_front(VTablePrefixDemang.size());
   }
-  if (GlobName.starts_with(VTablePrefix)) {
+  if (psr::startsWith(GlobName, VTablePrefix)) {
     return GlobName.drop_front(VTablePrefix.size());
   }
   return GlobName;
@@ -179,10 +180,10 @@ LLVMVFTableProvider::removeVTablePrefix(llvm::StringRef GlobName) noexcept {
 
 /// Supercedes DIBasedTypeHierarchy::isVTable() + removeVTablePrefix
 bool LLVMVFTableProvider::isVTable(llvm::StringRef MangledVarName) {
-  if (MangledVarName.starts_with(VTablePrefix)) {
+  if (psr::startsWith(MangledVarName, VTablePrefix)) {
     return true;
   }
   // In LLVM 17 demangle() takes a StringRef
   auto Demang = llvm::demangle(MangledVarName.str());
-  return llvm::StringRef(Demang).starts_with(VTablePrefixDemang);
+  return psr::startsWith(llvm::StringRef(Demang), VTablePrefixDemang);
 }

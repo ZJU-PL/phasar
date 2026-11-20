@@ -22,7 +22,11 @@
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/IntrinsicInst.h"
 #include "llvm/IR/Operator.h"
+#if LLVM_VERSION_MAJOR < 16
+#include "llvm/ADT/Triple.h"
+#else
 #include "llvm/TargetParser/Triple.h"
+#endif
 
 #include <concepts>
 #include <memory>

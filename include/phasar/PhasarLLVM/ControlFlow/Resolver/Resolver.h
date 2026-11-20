@@ -21,6 +21,7 @@
 #include "phasar/PhasarLLVM/Utils/VirtualCallUtils.h"
 #include "phasar/Utils/MaybeUniquePtr.h"
 
+#include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/DenseSet.h"
 #include "llvm/ADT/SmallVector.h"
 

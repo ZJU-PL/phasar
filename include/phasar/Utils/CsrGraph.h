@@ -34,7 +34,7 @@ csrSuccs(const TypedVector<IndexId, uint32_t> &Offsets,
          const llvm::SmallVectorImpl<VtxId> &Targets, IndexId Vtx) {
   auto Start = Offsets[Vtx];
   auto End = Offsets[nextId(Vtx)];
-  return llvm::ArrayRef(Targets).slice(Start, End - Start);
+  return llvm::ArrayRef<VtxId>(Targets).slice(Start, End - Start);
 }
 
 template <IdType IndexId, typename VtxId>
@@ -43,7 +43,7 @@ csrSuccsMut(const TypedVector<IndexId, uint32_t> &Offsets,
             llvm::SmallVectorImpl<VtxId> &Targets, IndexId Vtx) {
   auto Start = Offsets[Vtx];
   auto End = Offsets[nextId(Vtx)];
-  return llvm::MutableArrayRef(Targets).slice(Start, End - Start);
+  return llvm::MutableArrayRef<VtxId>(Targets).slice(Start, End - Start);
 }
 
 /// Immutable directed graph in compressed-sparse-row format: the successors of

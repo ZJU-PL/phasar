@@ -12,6 +12,7 @@
 #include "phasar/PhasarLLVM/ControlFlow/EntryFunctionUtils.h"
 #include "phasar/PhasarLLVM/DB/LLVMProjectIRDB.h"
 #include "phasar/PhasarLLVM/Utils/LLVMShorthands.h"
+#include "phasar/Utils/LLVMCompatibility.h"
 #include "phasar/Utils/Logger.h"
 #include "phasar/Utils/Utilities.h"
 
@@ -359,14 +360,18 @@ llvm::Function *GlobalCtorsDtorsModel::buildModel(
   }
 
   auto &Ctx = M.getContext();
+#if LLVM_VERSION_MAJOR < 15
+  auto *ArgvTy = llvm::Type::getInt8PtrTy(Ctx)->getPointerTo();
+#else
+  auto *ArgvTy = llvm::PointerType::get(Ctx, 0);
+#endif
   auto *GlobModel = llvm::cast<llvm::Function>(
       M.getOrInsertFunction(ModelName,
                             /*retTy*/
                             llvm::Type::getVoidTy(Ctx),
                             /*argc*/
                             llvm::Type::getInt32Ty(Ctx),
-                            /*argv*/
-                            llvm::PointerType::get(Ctx, 0))
+                            /*argv*/ ArgvTy)
           .getCallee());
 
   scope_exit FinalizeModel = [&] {
@@ -447,7 +452,9 @@ llvm::Function *GlobalCtorsDtorsModel::buildModel(
   IRB.SetInsertPoint(DefaultBB);
   IRB.CreateUnreachable();
 
-  for (const auto &[Idx, UEntry] : llvm::enumerate(UserEntryPoints)) {
+  for (auto Entry : llvm::enumerate(UserEntryPoints)) {
+    auto Idx = Entry.index();
+    auto *UEntry = Entry.value();
     auto *BB =
         llvm::BasicBlock::Create(Ctx, "call." + UEntry->getName(), GlobModel);
     IRB.SetInsertPoint(BB);
@@ -484,6 +491,6 @@ bool GlobalCtorsDtorsModel::isPhasarGenerated(
   const auto Cases = {ModelName, DtorModelName, DtorsCallerName,
                       UserEntrySelectorName, NonDetValuePrefix};
   return llvm::any_of(Cases, [FunctionName](llvm::StringLiteral Case) {
-    return FunctionName.starts_with(Case);
+    return psr::startsWith(FunctionName, Case);
   });
 }

@@ -125,9 +125,7 @@ template <typename FF> struct IsFlowFunction {
 /// Helper template to check at compile-time whether a type implements the
 /// FlowFunction interface, no matter which data-flow fact type it uses.
 template <typename FF>
-concept is_flowfunction_v
-    [[deprecated("Use IsFlowFunctionLike instead. It is more flexible")]] =
-        IsFlowFunction<FF>::value; // NOLINT
+concept is_flowfunction_v = IsFlowFunction<FF>::value; // NOLINT
 
 /// Given a flow-function type FF, returns a (smart) pointer type pointing to FF
 template <IsFlowFunctionLike FF>

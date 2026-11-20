@@ -18,6 +18,7 @@
 
 #include "phasar/Config/Configuration.h"
 #include "phasar/Utils/Fn.h"
+#include "phasar/Utils/LLVMCompatibility.h"
 #include "phasar/Utils/LibrarySummary.h"
 #include "phasar/Utils/Utilities.h"
 
@@ -498,7 +499,7 @@ bool psr::isGuardVariable(const llvm::Value *V) {
   }
   if (const auto *GV = llvm::dyn_cast<llvm::GlobalVariable>(V)) {
     // ZGV is the encoding of "GuardVariable"
-    return GV->getName().starts_with("_ZGV");
+    return psr::startsWith(GV->getName(), "_ZGV");
   }
   return false;
 }
@@ -928,7 +929,7 @@ bool psr::isVaListAlloca(const llvm::AllocaInst &Alloc) {
 
 const llvm::DIType *psr::stripPointerTypes(const llvm::DIType *DITy) {
   while (const auto *DerivedTy =
-             llvm::dyn_cast_if_present<llvm::DIDerivedType>(DITy)) {
+             psr::dynCastIfPresent<llvm::DIDerivedType>(DITy)) {
     // get rid of the pointer
     DITy = DerivedTy->getBaseType();
   }

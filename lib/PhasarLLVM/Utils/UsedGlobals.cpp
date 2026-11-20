@@ -4,6 +4,7 @@
 #include "phasar/PhasarLLVM/DB/LLVMProjectIRDB.h"
 #include "phasar/Utils/Compressor.h"
 #include "phasar/Utils/FunctionId.h"
+#include "phasar/Utils/LLVMCompatibility.h"
 #include "phasar/Utils/SCCGeneric.h"
 
 #include "llvm/IR/Function.h"
@@ -15,7 +16,7 @@ using namespace psr;
 
 static bool isEffectivelyConstant(const llvm::GlobalVariable *Glob) {
   auto Name = Glob->getName();
-  if (Name.starts_with("_ZTV") || Name.starts_with("_ZTI")) {
+  if (psr::startsWith(Name, "_ZTV") || psr::startsWith(Name, "_ZTI")) {
     return true;
   }
 

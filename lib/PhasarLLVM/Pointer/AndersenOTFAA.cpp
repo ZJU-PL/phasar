@@ -22,6 +22,7 @@
 #include "phasar/Pointer/CallingContextConstructor.h"
 #include "phasar/Utils/Compressor.h"
 #include "phasar/Utils/IotaIterator.h"
+#include "phasar/Utils/LLVMCompatibility.h"
 #include "phasar/Utils/LibCSummary.h"
 #include "phasar/Utils/LibrarySummary.h"
 #include "phasar/Utils/Soundness.h"
@@ -1154,7 +1155,8 @@ struct [[clang::internal_linkage]] AndersenOTFSolver::SolverData {
         return true;
       }
       if (const auto *II = llvm::dyn_cast<llvm::IntrinsicInst>(Usr)) {
-        if (llvm::isLifetimeIntrinsic(II->getIntrinsicID()) ||
+        if ((II->getIntrinsicID() == llvm::Intrinsic::lifetime_start ||
+             II->getIntrinsicID() == llvm::Intrinsic::lifetime_end) ||
             llvm::isa<llvm::DbgInfoIntrinsic>(II)) {
           continue;
         }
@@ -1710,7 +1712,8 @@ struct [[clang::internal_linkage]] AndersenOTFSolver::SolverData {
         const auto *GV = llvm::dyn_cast_or_null<llvm::GlobalVariable>(
             CVar.Var.getBase().valueOrNull());
         if (!GV || !GV->hasName() ||
-            !GV->getName().starts_with(DIBasedTypeHierarchy::VTablePrefix) ||
+            !psr::startsWith(GV->getName(),
+                             DIBasedTypeHierarchy::VTablePrefix) ||
             !GV->hasInitializer()) {
           return;
         }

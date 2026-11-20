@@ -10,6 +10,7 @@
 #include "phasar/PhasarLLVM/Utils/LLVMIRToSrc.h"
 
 #include "phasar/PhasarLLVM/Utils/LLVMShorthands.h"
+#include "phasar/Utils/LLVMCompatibility.h"
 
 #include "llvm/ADT/APInt.h"
 #include "llvm/ADT/SmallString.h"
@@ -248,8 +249,7 @@ getOffsetAndBase(const llvm::Value *V) {
 }
 
 static llvm::DIType *getStructElementType(llvm::DIType *BaseTy, size_t Offset) {
-  const auto *DerivedTy =
-      llvm::dyn_cast_if_present<llvm::DIDerivedType>(BaseTy);
+  const auto *DerivedTy = psr::dynCastIfPresent<llvm::DIDerivedType>(BaseTy);
   auto *StructTy = DerivedTy ? DerivedTy->getBaseType() : BaseTy;
 
   if (Offset == 0 && DerivedTy) {
@@ -257,13 +257,13 @@ static llvm::DIType *getStructElementType(llvm::DIType *BaseTy, size_t Offset) {
   }
 
   if (const auto *CompositeTy =
-          llvm::dyn_cast_if_present<llvm::DICompositeType>(StructTy)) {
+          psr::dynCastIfPresent<llvm::DICompositeType>(StructTy)) {
     auto Elems = CompositeTy->getElements();
     if (!Elems || Offset >= Elems.size()) {
       return nullptr;
     }
 
-    if (auto *ElemTy = llvm::dyn_cast_if_present<llvm::DIType>(Elems[Offset])) {
+    if (auto *ElemTy = psr::dynCastIfPresent<llvm::DIType>(Elems[Offset])) {
       return ElemTy;
     }
   }
@@ -516,9 +516,9 @@ bool SourceCodeInfo::equivalentWith(const SourceCodeInfo &Other) const {
     Pos = 0;
   }
 
-  return llvm::StringRef(Other.SourceCodeFilename)
-      .ends_with(llvm::StringRef(SourceCodeFilename)
-                     .slice(Pos + 1, llvm::StringRef::npos));
+  return psr::endsWith(llvm::StringRef(Other.SourceCodeFilename),
+                       llvm::StringRef(SourceCodeFilename)
+                           .slice(Pos + 1, llvm::StringRef::npos));
 }
 
 void psr::from_json(const nlohmann::json &J, SourceCodeInfo &Info) {

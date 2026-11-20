@@ -9,6 +9,8 @@
 
 #include "phasar/PhasarLLVM/Utils/Annotation.h"
 
+#include "phasar/Utils/LLVMCompatibility.h"
+
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Analysis/ValueTracking.h"
 #include "llvm/IR/Argument.h"
@@ -32,8 +34,8 @@ VarAnnotation::VarAnnotation(const llvm::CallBase *AnnotationCall) noexcept
     : AnnotationCall(AnnotationCall) {
   [[maybe_unused]] auto *Callee = AnnotationCall->getCalledFunction();
   assert(Callee && Callee->hasName() &&
-         (Callee->getName().starts_with("llvm.var.annotation") ||
-          Callee->getName().starts_with("llvm.ptr.annotation")));
+         (psr::startsWith(Callee->getName(), "llvm.var.annotation") ||
+          psr::startsWith(Callee->getName(), "llvm.ptr.annotation")));
 }
 
 const llvm::Value *VarAnnotation::getValue() const {

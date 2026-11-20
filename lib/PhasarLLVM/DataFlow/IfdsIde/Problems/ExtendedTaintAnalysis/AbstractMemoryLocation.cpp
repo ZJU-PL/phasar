@@ -37,7 +37,8 @@ AbstractMemoryLocationImpl::AbstractMemoryLocationImpl(
 AbstractMemoryLocationImpl::AbstractMemoryLocationImpl(
     const llvm::Value *Baseptr, llvm::SmallVectorImpl<ptrdiff_t> &&Offsets,
     unsigned Lifetime) noexcept
-    : AbstractMemoryLocationImpl(Baseptr, llvm::ArrayRef(Offsets), Lifetime) {}
+    : AbstractMemoryLocationImpl(Baseptr, llvm::ArrayRef<ptrdiff_t>(Offsets),
+                                 Lifetime) {}
 AbstractMemoryLocationImpl::AbstractMemoryLocationImpl(
     const llvm::Value *Baseptr, llvm::ArrayRef<ptrdiff_t> Offsets,
     unsigned Lifetime) noexcept
